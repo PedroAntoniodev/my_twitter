@@ -51,7 +51,7 @@ urlpatterns = [
     path('api/profile/<str:username>/', ProfileDetailView.as_view()),
 
     # Seguidores
-    path('api/follow/<str:username>', FollowToggleView.as_view()),
+    path('api/follow/<str:username>/', FollowToggleView.as_view()),
     path('api/followers/<str:username>/', FollowersListView.as_view()),
     path('api/following/<str:username>/', FollowingListView.as_view()),
 
