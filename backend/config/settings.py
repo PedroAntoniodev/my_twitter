@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-y=ly3c5)1headi=2q*oea6_(%hh6=6z6-+be08cpblcm95cwd#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'pedroantoniodev1.pythonanywhere.com'
+]
+
 
 
 # Application definition
@@ -149,8 +154,3 @@ REST_FRAMEWORK = {
 # Cors
 CORS_ALLOW_ALL_ORIGINS = True
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'pedroantoniodev1.pythonanywhere.com'
-]
