@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
@@ -14,7 +14,15 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
+
 class MeView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         return Response(UserSerializer(request.user).data)
     
@@ -35,7 +43,7 @@ class FollowToggleView(APIView):
     def post(self, request, username):
         target = get_object_or_404(User, username=username)
         if target == request.user:
-            return Response({'datail': 'Você não pode seguir a si mesmo.' }, status=400)
+            return Response({'detail': 'Você não pode seguir a si mesmo.' }, status=400)
         obj, created = Follow.objects.get_or_create(follower=request.user, following=target)
         if not created:
             obj.delete()
@@ -53,4 +61,3 @@ class FollowersListView(APIView):
         user = get_object_or_404(User, username=username)
         followers = user.followers.all().values_list('follower__username', flat=True)
         return Response({'followers': list(followers)})
-    

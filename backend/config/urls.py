@@ -26,7 +26,8 @@ from users.views import (
     ProfileUpdateView,
     FollowToggleView,
     FollowersListView,
-    FollowingListView
+    FollowingListView,
+    UserListView
 )
 from posts.views import (
     PostListCreateView, 
@@ -36,9 +37,15 @@ from posts.views import (
     CommentDetailView,
     FeedView
     )
+from .views import home, api_index
 
 urlpatterns = [
+    path('', home),
+    path('api/', api_index),
     path('admin/', admin.site.urls),
+
+    # Users
+    path('api/users/', UserListView.as_view()),
 
     # Authenticação
     path('api/auth/register/', RegisterView.as_view()),
