@@ -10,7 +10,9 @@ export const RegisterPageContainer = styled.div`
   .FirstContentSecondColumn,
   .SecondContentFirstColumn,
   .SecondContentSecondColumn {
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
   }
 
   &.register .FirstContentFirstColumn,
@@ -28,7 +30,7 @@ export const RegisterPageContainer = styled.div`
   &.register .Content::before {
     transform: translateX(0);
     opacity: 1;
-    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   }
 
   &.login .FirstContentFirstColumn,
@@ -46,7 +48,7 @@ export const RegisterPageContainer = styled.div`
   &.login .Content::before {
     transform: translateX(150%);
     opacity: 0.8;
-    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   }
 `;
 
@@ -141,7 +143,9 @@ export const ButtonPrimary = styled.button`
   background-color: transparent;
   border: 2px solid #fff;
   cursor: pointer;
-  transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+  transition:
+    background-color 0.4s ease-in-out,
+    color 0.4s ease-in-out;
 
   &:hover {
     background-color: #fff;
