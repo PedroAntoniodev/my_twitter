@@ -5,6 +5,49 @@ export const RegisterPageContainer = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
+
+  .FirstContentFirstColumn,
+  .FirstContentSecondColumn,
+  .SecondContentFirstColumn,
+  .SecondContentSecondColumn {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  &.register .FirstContentFirstColumn,
+  &.register .FirstContentSecondColumn {
+    z-index: 11;
+  }
+
+  &.register .SecondContentFirstColumn,
+  &.register .SecondContentSecondColumn {
+    z-index: -1;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  &.register .Content::before {
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+
+  &.login .FirstContentFirstColumn,
+  &.login .FirstContentSecondColumn {
+    z-index: -1;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  &.login .SecondContentFirstColumn,
+  &.login .SecondContentSecondColumn {
+    z-index: 11;
+  }
+
+  &.login .Content::before {
+    transform: translateX(150%);
+    opacity: 0.8;
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
 `;
 
 export const RegisterPageForm = styled.form`
@@ -15,7 +58,7 @@ export const RegisterPageForm = styled.form`
 `;
 
 export const FirstContent = styled.div`
-  display: none;
+  display: flex;
 
   &.Content {
     background-color: #fff;
@@ -33,22 +76,14 @@ export const FirstContent = styled.div`
       height: 100%;
       border-radius: 15px;
       background-color: #007bff;
+      transition: left 0.6s ease-in-out;
 
       left: 0;
     }
   }
 `;
 
-export const SecondContent = styled(FirstContent)`
-  display: flex;
-  position: absolute;
-
-  &.Content {
-    &::before {
-      left: 60%;
-    }
-  }
-`;
+export const SecondContent = styled(FirstContent)``;
 
 export const TitlePrimary = styled.h2`
   color: #fff;
@@ -60,16 +95,28 @@ export const TitleSecondary = styled(TitlePrimary)`
   color: #007bff;
 `;
 
-export const FirstColumn = styled.div`
+export const FirstContentFirstColumn = styled.div`
   text-align: center;
   width: 40%;
-  z-index: 10;
+  z-index: 11;
 `;
 
-export const SecondColumn = styled.div`
+export const FirstContentSecondColumn = styled.div`
   text-align: center;
   width: 60%;
-  z-index: 10;
+  z-index: 11;
+`;
+
+export const SecondContentFirstColumn = styled.div`
+  text-align: center;
+  width: 60%;
+  z-index: -1;
+`;
+
+export const SecondContentSecondColumn = styled.div`
+  text-align: center;
+  width: 40%;
+  z-index: -1;
 `;
 
 export const DescriptionPrimary = styled.p`
