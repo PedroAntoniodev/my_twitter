@@ -46,7 +46,15 @@ const HomePage = () => {
 
   const handleLike = (id: number) => {
     setPosts(
-      posts.map((p) => (p.id === id ? { ...p, likes: p.likes + 1 } : p)),
+      posts.map((p) => {
+        if (p.id !== id) return p;
+
+        if (p.likedByMe) {
+          return { ...p, likes: p.likes - 1, likedByMe: false };
+        } else {
+          return { ...p, likes: p.likes + 1, likedByMe: true };
+        }
+      }),
     );
   };
 
@@ -92,7 +100,7 @@ const HomePage = () => {
 
             <S.Actions>
               <button onClick={() => handleLike(post.id)}>
-                ❤️ {post.likes}
+                {post.likedByMe ? "👎" : "👍"} {post.likes}
               </button>
             </S.Actions>
 

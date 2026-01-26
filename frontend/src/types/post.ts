@@ -4,6 +4,7 @@ export interface Post {
   content: string;
   createdAt: Date;
   likes: number;
+  likedByMe?: boolean;
   comments: Comment[];
 }
 
