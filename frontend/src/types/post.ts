@@ -1,16 +1,18 @@
 export interface Post {
   id: number;
-  user: string;
+  author: string;
   content: string;
-  createdAt: Date;
-  likes: number;
+  created_at: string;
+  updated_at: string;
   likedByMe?: boolean;
+  total_likes: number;
+  total_comments: number;
   comments: Comment[];
 }
 
 export interface Comment {
   id: number;
-  user: string;
-  text: string;
-  createdAt: Date;
+  author: string;
+  content: string;
+  created_at: string;
 }

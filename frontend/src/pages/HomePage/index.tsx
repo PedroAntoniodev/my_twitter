@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type React from "react";
 
 import Header from "../../components/Header";
@@ -6,77 +6,134 @@ import * as S from "./styles";
 import type { Post } from "../../types/post";
 
 const HomePage = () => {
-  const [posts, setPosts] = useState<Post[]>([
-    {
-      id: 1,
-      user: "Pedro",
-      content: "Olá mundo! primeiro post MyTwitter",
-      createdAt: new Date(),
-      likes: 0,
-      comments: [],
-    },
-    {
-      id: 2,
-      user: "Laura",
-      content: "Aprendendo muito com esse projeto 😎",
-      createdAt: new Date(),
-      likes: 0,
-      comments: [],
-    },
-  ]);
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(
+          "https://pedroantoniodev1.pythonanywhere.com/api/posts/",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access")}`,
+            },
+          },
+        );
+        if (!response.ok) throw new Error("Erro ao buscar posts");
+        const data = await response.json();
+        console.log("Posts da API:", data);
+        setPosts(data.results);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchPosts();
+  }, []);
 
   const [newPost, setNewPost] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPost.trim()) return;
 
-    const post: Post = {
-      id: posts.length + 1,
-      user: "meuUsuarioTeste",
-      content: newPost,
-      createdAt: new Date(),
-      likes: 0,
-      comments: [],
-    };
-
-    setPosts([post, ...posts]);
-    setNewPost("");
+    try {
+      const response = await fetch(
+        "https://pedroantoniodev1.pythonanywhere.com/api/posts/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
+          },
+          body: JSON.stringify({ content: newPost }),
+        },
+      );
+      if (!response.ok) throw new Error("Erro ao criar post");
+      const created = await response.json();
+      setPosts([created, ...posts]);
+      setNewPost("");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleLike = (id: number) => {
-    setPosts(
-      posts.map((p) => {
-        if (p.id !== id) return p;
+  const handleLike = async (id: number) => {
+    try {
+      const response = await fetch(
+        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${id}/like/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
+          },
+        },
+      );
+      if (!response.ok) throw new Error("Erro ao dar like");
 
-        if (p.likedByMe) {
-          return { ...p, likes: p.likes - 1, likedByMe: false };
-        } else {
-          return { ...p, likes: p.likes + 1, likedByMe: true };
-        }
-      }),
-    );
+      setPosts(
+        posts.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                likes: p.likedByMe ? p.total_likes - 1 : p.total_likes + 1,
+                likedByMe: !p.likedByMe,
+              }
+            : p,
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleComment = (id: number, comment: string) => {
-    setPosts(
-      posts.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              comments: [
-                ...p.comments,
-                {
-                  id: p.comments.length + 1,
-                  user: "meuUsuarioTeste",
-                  text: comment,
-                  createdAt: new Date(),
-                },
-              ],
-            }
-          : p,
-      ),
-    );
+  const handleComment = async (id: number, comment: string) => {
+    try {
+      const response = await fetch(
+        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${id}/comment/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
+          },
+          body: JSON.stringify({ text: comment }),
+        },
+      );
+      if (!response.ok) throw new Error("Erro ao comentar");
+      const newComment = await response.json();
+
+      setPosts(
+        posts.map((p) =>
+          p.id === id ? { ...p, comments: [...p.comments, newComment] } : p,
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchComments = async (postId: number) => {
+    try {
+      const resoponse = await fetch(
+        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${postId}/comments/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
+          },
+        },
+      );
+      if (!resoponse.ok) throw new Error("Erro ao buscar comentários");
+      const data = await resoponse.json();
+
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId ? { ...p, comments: data.results } : p,
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -94,22 +151,27 @@ const HomePage = () => {
       <S.Feed>
         {posts.map((post) => (
           <S.Post key={post.id}>
-            <strong>@{post.user}</strong>
+            <strong>@{post.author}</strong>
             <p>{post.content}</p>
-            <span>{post.createdAt.toLocaleString()}</span>
+            <span>{new Date(post.created_at).toLocaleString("pt-BR")}</span>
 
             <S.Actions>
               <button onClick={() => handleLike(post.id)}>
-                {post.likedByMe ? "👎" : "👍"} {post.likes}
+                {post.likedByMe ? "👎" : "👍"} {post.total_likes}
               </button>
             </S.Actions>
 
             <S.Comments>
-              {post.comments.map((c) => (
-                <div key={c.id}>
-                  <strong>@{c.user}</strong> {c.text}
-                </div>
-              ))}
+              <strong>{post.total_comments} comentários</strong>
+              <button onClick={() => fetchComments(post.id)}>
+                Ver comentários
+              </button>
+              {post.comments &&
+                post.comments.map((c) => (
+                  <div key={c.id}>
+                    <strong>@{c.author}</strong> {c.content}
+                  </div>
+                ))}
               <S.CommentForm
                 onSubmit={(e) => {
                   e.preventDefault();
