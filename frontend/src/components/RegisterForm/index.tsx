@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import Loader from "../Loader";
+
 import { MdEmail } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
@@ -13,9 +15,10 @@ interface RegisterFormProps {
     password: string,
     confirmPassword: string,
   ) => void;
+  loading: boolean;
 }
 
-const RegisterForm = ({ onRegister }: RegisterFormProps) => {
+const RegisterForm = ({ onRegister, loading }: RegisterFormProps) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -68,7 +71,9 @@ const RegisterForm = ({ onRegister }: RegisterFormProps) => {
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
       </div>
-      <S.ButtonSecondary type="submit">Cadastrar</S.ButtonSecondary>
+      <S.ButtonSecondary type="submit" disabled={loading}>
+        {loading ? <Loader /> : "Cadastre-se"}
+      </S.ButtonSecondary>
     </S.Form>
   );
 };

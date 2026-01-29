@@ -7,6 +7,7 @@ import LoginForm from "../../components/LoginForm";
 const AuthPage = () => {
   /// true = register, false = login
   const [isRegister, setIsRegister] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async (
     username: string,
@@ -52,6 +53,7 @@ const AuthPage = () => {
   };
 
   const handleLogin = async (username: string, password: string) => {
+    setLoading(true);
     try {
       const response = await fetch(
         "https://pedroantoniodev1.pythonanywhere.com/api/auth/login/",
@@ -81,6 +83,8 @@ const AuthPage = () => {
     } catch (error) {
       alert("Erro na conexão com o servidor.");
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,7 +105,7 @@ const AuthPage = () => {
           <S.DescriptionSecondary>
             Preencha o formulário abaixo para criar uma conta
           </S.DescriptionSecondary>
-          <RegisterForm onRegister={handleRegister} />
+          <RegisterForm onRegister={handleRegister} loading={loading} />
         </S.FirstContentSecondColumn>
       </S.FirstContent>
       <S.SecondContent className="Content" style={{ position: "absolute" }}>
@@ -110,7 +114,7 @@ const AuthPage = () => {
           <S.DescriptionSecondary>
             Coloque seus dados para entrar na sua conta
           </S.DescriptionSecondary>
-          <LoginForm onLogin={handleLogin} />
+          <LoginForm onLogin={handleLogin} loading={loading} />
         </S.SecondContentFirstColumn>
         <S.SecondContentSecondColumn className="SecondContentSecondColumn">
           <S.TitlePrimary>Olá, bem vindo!</S.TitlePrimary>
