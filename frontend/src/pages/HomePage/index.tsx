@@ -71,14 +71,12 @@ const HomePage = () => {
       );
       if (!response.ok) throw new Error("Erro ao dar like");
 
-      setPosts(
-        posts.map((p) =>
+      const data = await response.json();
+
+      setPosts((prev) =>
+        prev.map((p) =>
           p.id === id
-            ? {
-                ...p,
-                likes: p.likedByMe ? p.total_likes - 1 : p.total_likes + 1,
-                likedByMe: !p.likedByMe,
-              }
+            ? { ...p, likedByMe: data.liked, total_likes: data.total_likes }
             : p,
         ),
       );
@@ -90,22 +88,29 @@ const HomePage = () => {
   const handleComment = async (id: number, comment: string) => {
     try {
       const response = await fetch(
-        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${id}/comment/`,
+        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${id}/comments/`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("access")}`,
           },
-          body: JSON.stringify({ text: comment }),
+          body: JSON.stringify({ content: comment }),
         },
       );
       if (!response.ok) throw new Error("Erro ao comentar");
       const newComment = await response.json();
+      console.log("comentario criado:", newComment);
 
-      setPosts(
-        posts.map((p) =>
-          p.id === id ? { ...p, comments: [...p.comments, newComment] } : p,
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                comments: [...(p.comments || []), newComment],
+                total_comments: p.total_comments + 1,
+              }
+            : p,
         ),
       );
     } catch (error) {

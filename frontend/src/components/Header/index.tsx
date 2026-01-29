@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { HeaderContainer } from "./styles";
 
 const Header = () => {
@@ -6,7 +7,9 @@ const Header = () => {
       <h1>
         <strong>My</strong>Twitter
       </h1>
-      <button>Perfil</button>
+      <Link to="/profile/:username">
+        <button>Perfil</button>
+      </Link>
     </HeaderContainer>
   );
 };
