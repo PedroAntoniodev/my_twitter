@@ -7,8 +7,8 @@ export const ProfileContainer = styled.div`
   text-align: center;
 
   img {
-    width: 120px;
-    height: 120px;
+    width: 240px;
+    height: 240px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 1rem;
@@ -18,88 +18,56 @@ export const ProfileContainer = styled.div`
   h2 {
     margin: 0.5rem 0;
     font-size: 1.5rem;
-    color: #333;
+    color: #4a90e2;
   }
 
-  p {
-    color: #666;
-    margin-bottom: 1rem;
-  }
-
-  button {
-    background: #4a90e2;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
-
-    &:hover {
-      background: #357ab8;
-    }
+  h3 {
+    margin: 10px 0;
   }
 `;
 
-export const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+export const InfoContent = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  gap: 10px;
+`;
 
-  form {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 400px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+export const FollowButton = styled.button`
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 0.5rem;
 
-    h3 {
-      margin-bottom: 0.5rem;
-      color: #333;
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      text-align: left;
-      font-weight: bold;
-      color: #444;
-    }
-
-    input,
-    textarea {
-      margin-top: 0.3rem;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    button {
-      margin-top: 0.5rem;
-      padding: 0.6rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button[type="submit"] {
-      background: #4a90e2;
-      color: white;
-    }
-
-    button[type="button"] {
-      background: #ccc;
-      color: #333;
-    }
+  &:hover {
+    background-color: #007bff;
   }
+`;
+
+export const FollowersCount = styled.p`
+  font-size: 18px;
+  margin-bottom: 20px;
+`;
+
+export const FollowersInfo = styled.span`
+  opacity: 0.5;
+`;
+
+export const Bio = styled.p`
+  font-size: 16px;
+  margin-top: 20px;
+  border: 2px solid #4a90e2;
+  padding: 10px;
+  border-radius: 10px;
+`;
+
+export const PostsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
 `;

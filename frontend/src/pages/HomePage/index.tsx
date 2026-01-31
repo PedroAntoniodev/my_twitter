@@ -1,37 +1,41 @@
 import { useEffect, useState } from "react";
-import type React from "react";
-
-import Header from "../../components/Header";
 import * as S from "./styles";
 import type { Post } from "../../types/post";
+import type { User } from "../../types/user";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [newPost, setNewPost] = useState("");
+  const [feedMode, setFeedMode] = useState<"all" | "following">("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<User[]>([]);
 
+  // Buscar posts conforme feedMode
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch(
-          "https://pedroantoniodev1.pythonanywhere.com/api/posts/",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access")}`,
-            },
+        const url =
+          feedMode === "all"
+            ? "https://pedroantoniodev1.pythonanywhere.com/api/posts/"
+            : "https://pedroantoniodev1.pythonanywhere.com/api/feed/";
+
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
           },
-        );
+        });
         if (!response.ok) throw new Error("Erro ao buscar posts");
         const data = await response.json();
-        console.log("Posts da API:", data);
-        setPosts(data.results);
+        setPosts(data.results || data);
       } catch (error) {
         console.error(error);
       }
     };
     fetchPosts();
-  }, []);
+  }, [feedMode]);
 
-  const [newPost, setNewPost] = useState("");
-
+  // Criar novo post
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPost.trim()) return;
@@ -57,85 +61,23 @@ const HomePage = () => {
     }
   };
 
-  const handleLike = async (id: number) => {
+  // Buscar usuários
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
+
     try {
       const response = await fetch(
-        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${id}/like/`,
+        `https://pedroantoniodev1.pythonanywhere.com/api/users/?search=${searchTerm}`,
         {
-          method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("access")}`,
           },
         },
       );
-      if (!response.ok) throw new Error("Erro ao dar like");
-
+      if (!response.ok) throw new Error("Erro ao buscar usuários");
       const data = await response.json();
-
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === id
-            ? { ...p, likedByMe: data.liked, total_likes: data.total_likes }
-            : p,
-        ),
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleComment = async (id: number, comment: string) => {
-    try {
-      const response = await fetch(
-        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${id}/comments/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
-          },
-          body: JSON.stringify({ content: comment }),
-        },
-      );
-      if (!response.ok) throw new Error("Erro ao comentar");
-      const newComment = await response.json();
-      console.log("comentario criado:", newComment);
-
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === id
-            ? {
-                ...p,
-                comments: [...(p.comments || []), newComment],
-                total_comments: p.total_comments + 1,
-              }
-            : p,
-        ),
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchComments = async (postId: number) => {
-    try {
-      const resoponse = await fetch(
-        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${postId}/comments/`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
-          },
-        },
-      );
-      if (!resoponse.ok) throw new Error("Erro ao buscar comentários");
-      const data = await resoponse.json();
-
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId ? { ...p, comments: data.results } : p,
-        ),
-      );
+      setSearchResults(data.results || data);
     } catch (error) {
       console.error(error);
     }
@@ -143,7 +85,46 @@ const HomePage = () => {
 
   return (
     <S.HomePageContainer>
-      <Header />
+      {/* Barra de busca */}
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Buscar usuários..."
+        />
+        <button type="submit">🔍</button>
+      </form>
+
+      {/* Resultados da busca */}
+      {searchResults.length > 0 && (
+        <div>
+          <h3>Resultados:</h3>
+          {searchResults.map((u) => (
+            <div key={u.id}>
+              <Link to={`/profile/${u.username}`}>@{u.username}</Link>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Botões de feed */}
+      <div>
+        <button
+          className={feedMode === "all" ? "active" : ""}
+          onClick={() => setFeedMode("all")}
+        >
+          Para você
+        </button>
+        <button
+          className={feedMode === "following" ? "active" : ""}
+          onClick={() => setFeedMode("following")}
+        >
+          Seguindo
+        </button>
+      </div>
+
+      {/* Formulário de novo post */}
       <S.NewPostForm onSubmit={handleSubmit}>
         <textarea
           value={newPost}
@@ -153,46 +134,14 @@ const HomePage = () => {
         <button type="submit">Postar</button>
       </S.NewPostForm>
 
+      {/* Feed */}
+      <h2>{feedMode === "all" ? "Feed - Para você" : "Feed - Seguindo"}</h2>
       <S.Feed>
         {posts.map((post) => (
           <S.Post key={post.id}>
             <strong>@{post.author}</strong>
             <p>{post.content}</p>
             <span>{new Date(post.created_at).toLocaleString("pt-BR")}</span>
-
-            <S.Actions>
-              <button onClick={() => handleLike(post.id)}>
-                {post.likedByMe ? "👎" : "👍"} {post.total_likes}
-              </button>
-            </S.Actions>
-
-            <S.Comments>
-              <strong>{post.total_comments} comentários</strong>
-              <button onClick={() => fetchComments(post.id)}>
-                Ver comentários
-              </button>
-              {post.comments &&
-                post.comments.map((c) => (
-                  <div key={c.id}>
-                    <strong>@{c.author}</strong> {c.content}
-                  </div>
-                ))}
-              <S.CommentForm
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const input = e.currentTarget.elements.namedItem(
-                    "comment",
-                  ) as HTMLInputElement;
-                  if (input.value.trim()) {
-                    handleComment(post.id, input.value);
-                    input.value = "";
-                  }
-                }}
-              >
-                <input name="comment" placeholder="Adicione um comentário" />
-                <button type="submit">Comentar</button>
-              </S.CommentForm>
-            </S.Comments>
           </S.Post>
         ))}
       </S.Feed>
