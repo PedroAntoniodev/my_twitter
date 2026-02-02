@@ -4,6 +4,8 @@ import type { Post } from "../../types/post";
 import type { User } from "../../types/user";
 import { Link } from "react-router-dom";
 
+import PostItem from "../../components/PostItem";
+
 const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState("");
@@ -138,11 +140,7 @@ const HomePage = () => {
       <h2>{feedMode === "all" ? "Feed - Para você" : "Feed - Seguindo"}</h2>
       <S.Feed>
         {posts.map((post) => (
-          <S.Post key={post.id}>
-            <strong>@{post.author}</strong>
-            <p>{post.content}</p>
-            <span>{new Date(post.created_at).toLocaleString("pt-BR")}</span>
-          </S.Post>
+          <PostItem key={post.id} post={post} showAuthorLink={true} />
         ))}
       </S.Feed>
     </S.HomePageContainer>

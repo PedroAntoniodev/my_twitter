@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import type { User } from "../../types/user";
-import type { Post } from "../../types/post"; // 👈 reaproveitando o type Post
+import type { Post } from "../../types/post";
 import AvatarImg from "../../assets/images/avatar.webp";
 import * as S from "./styles";
+import PostItem from "../../components/PostItem";
 
 interface Profile {
   user: number;
@@ -16,7 +17,7 @@ const ProfilePage = () => {
   const { username } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]); // 👈 usando o type Post
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,19 +47,21 @@ const ProfilePage = () => {
         const profileData = await profileRes.json();
         setProfile(profileData);
 
-        // Buscar posts do usuário pelo id
-        if (profileData.user) {
-          const postsRes = await fetch(
-            `https://pedroantoniodev1.pythonanywhere.com/api/posts/?user=${profileData.user}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("access")}`,
-              },
+        // Buscar todos os posts e filtrar no frontend
+        const postsRes = await fetch(
+          "https://pedroantoniodev1.pythonanywhere.com/api/posts/",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access")}`,
             },
-          );
-          const postsData = await postsRes.json();
-          setPosts(postsData.results || postsData);
-        }
+          },
+        );
+        const postsData = await postsRes.json();
+        const allPosts = postsData.results || postsData;
+
+        // Filtrar apenas os posts do usuário visitado
+        const userPosts = allPosts.filter((p: Post) => p.author === username);
+        setPosts(userPosts);
       } catch (error) {
         console.error(error);
       }
@@ -74,35 +77,34 @@ const ProfilePage = () => {
     : "@" + user?.username;
 
   return (
-    <S.ProfileContainer>
-      <img src={profile?.avatar || AvatarImg} alt="Foto de perfil" />
-      <S.InfoContent>
-        <h2>{displayName}</h2>
-        <S.FollowButton>Seguir</S.FollowButton>
-      </S.InfoContent>
-      <S.InfoContent>
-        <S.FollowersCount>
-          1 <S.FollowersInfo>Seguidores</S.FollowersInfo>
-        </S.FollowersCount>
-        <S.FollowersCount>
-          15 <S.FollowersInfo>Seguindo</S.FollowersInfo>
-        </S.FollowersCount>
-      </S.InfoContent>
-      <S.Bio>{profile?.bio || "Sem bio ainda"}</S.Bio>
-
-      {/* Posts do usuário */}
-      <h3>Posts</h3>
-      {posts.length > 0 ? (
-        posts.map((post) => (
-          <S.PostsContainer key={post.id}>
-            <p>{post.content}</p>
-            <span>{new Date(post.created_at).toLocaleString("pt-BR")}</span>
-          </S.PostsContainer>
-        ))
-      ) : (
-        <p>Este usuário ainda não postou nada.</p>
-      )}
-    </S.ProfileContainer>
+    <>
+      <S.ProfileContainer>
+        <img src={profile?.avatar || AvatarImg} alt="Foto de perfil" />
+        <S.InfoContent>
+          <h2>{displayName}</h2>
+          <S.FollowButton>Seguir</S.FollowButton>
+        </S.InfoContent>
+        <S.InfoContent>
+          <S.FollowersCount>
+            1 <S.FollowersInfo>Seguidores</S.FollowersInfo>
+          </S.FollowersCount>
+          <S.FollowersCount>
+            15 <S.FollowersInfo>Seguindo</S.FollowersInfo>
+          </S.FollowersCount>
+        </S.InfoContent>
+        <S.Bio>{profile?.bio || "Sem bio ainda"}</S.Bio>
+      </S.ProfileContainer>
+      <div>
+        <h3>Posts</h3>
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <PostItem key={post.id} post={post} showAuthorLink={false} />
+          ))
+        ) : (
+          <p>Este usuário ainda não postou nada.</p>
+        )}
+      </div>
+    </>
   );
 };
 
