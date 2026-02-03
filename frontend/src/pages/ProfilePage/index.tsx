@@ -94,8 +94,8 @@ const ProfilePage = () => {
         </S.InfoContent>
         <S.Bio>{profile?.bio || "Sem bio ainda"}</S.Bio>
       </S.ProfileContainer>
-      <div>
-        <h3>Posts</h3>
+      <S.PostsContainer>
+        <h3>Posts de @{username}</h3>
         {posts.length > 0 ? (
           posts.map((post) => (
             <PostItem key={post.id} post={post} showAuthorLink={false} />
@@ -103,7 +103,7 @@ const ProfilePage = () => {
         ) : (
           <p>Este usuário ainda não postou nada.</p>
         )}
-      </div>
+      </S.PostsContainer>
     </>
   );
 };

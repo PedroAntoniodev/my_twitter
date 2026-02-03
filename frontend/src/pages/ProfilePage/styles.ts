@@ -67,7 +67,12 @@ export const Bio = styled.p`
 
 export const PostsContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 20px;
   margin-top: 20px;
+
+  h3 {
+    text-align: center;
+    color: #4a90e2;
+  }
 `;

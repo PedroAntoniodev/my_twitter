@@ -7,6 +7,11 @@ export const Post = styled.div`
 
   strong {
     color: #007bff;
+    margin-right: 4px;
+  }
+
+  a {
+    text-decoration: none;
   }
 
   p {

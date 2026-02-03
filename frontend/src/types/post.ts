@@ -4,7 +4,7 @@ export interface Post {
   content: string;
   created_at: string;
   updated_at: string;
-  likedByMe?: boolean;
+  liked_by_me?: boolean;
   total_likes: number;
   total_comments: number;
   comments: Comment[];

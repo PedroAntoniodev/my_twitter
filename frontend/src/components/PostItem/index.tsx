@@ -13,7 +13,7 @@ const PostItem = ({ post, showAuthorLink = true }: PostItemProps) => {
   const [newComment, setNewComment] = useState("");
   const [likes, setLikes] = useState(post.total_likes || 0);
   const [showAllComments, setShowAllComments] = useState(false);
-  const [likedByMe, setLikedByMe] = useState(false);
+  const [likedByMe, setLikedByMe] = useState(post.liked_by_me || false);
 
   // Buscar comentários do post
   useEffect(() => {
@@ -45,15 +45,29 @@ const PostItem = ({ post, showAuthorLink = true }: PostItemProps) => {
     );
 
     if (response.ok) {
-      setLikedByMe((prev) => !prev);
-      setLikes((prev) => (likedByMe ? prev - 1 : prev + 1));
+      const updated = await fetch(
+        `https://pedroantoniodev1.pythonanywhere.com/api/posts/${post.id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
+          },
+        },
+      );
+      if (updated.ok) {
+        const data = await updated.json();
+        setLikes(data.total_likes);
+        setLikedByMe(data.liked_by_me);
+      }
     }
   };
 
   // Adicionar comentário
   const handleComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!newComment.trim()) {
+      alert("Você precisa escrever algo antes de comentar");
+      return;
+    }
 
     const res = await fetch(
       `https://pedroantoniodev1.pythonanywhere.com/api/posts/${post.id}/comments/`,
@@ -86,7 +100,18 @@ const PostItem = ({ post, showAuthorLink = true }: PostItemProps) => {
         <strong>@{post.author}</strong>
       )}
       <p>{post.content}</p>
-      <span>{new Date(post.created_at).toLocaleString("pt-BR")}</span>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span>{new Date(post.created_at).toLocaleString("pt-BR")}</span>
+        <S.Button onClick={handleLike}>
+          {likedByMe ? "💔 Descurtir" : "❤️ Curtir"} ({likes})
+        </S.Button>
+      </div>
 
       {/* Botão de like */}
 
@@ -96,8 +121,9 @@ const PostItem = ({ post, showAuthorLink = true }: PostItemProps) => {
         {visibleComments.map((c) => (
           <div key={c.id}>
             <Link to={`/profile/${c.author}/`}>
-              <strong>@{c.author}</strong>: {c.content}
+              <strong>@{c.author}:</strong>
             </Link>
+            {c.content}
           </div>
         ))}
 
@@ -114,7 +140,6 @@ const PostItem = ({ post, showAuthorLink = true }: PostItemProps) => {
         )}
       </S.Comments>
 
-      {/* Formulário de comentário */}
       <S.CommentForm onSubmit={handleComment}>
         <input
           type="text"
@@ -123,9 +148,6 @@ const PostItem = ({ post, showAuthorLink = true }: PostItemProps) => {
           placeholder="Escreva um comentário..."
         />
         <S.Button type="submit">Comentar</S.Button>
-        <S.Button onClick={handleLike}>
-          {likedByMe ? "💔 Descurtir" : "❤️ Curtir"} ({likes})
-        </S.Button>
       </S.CommentForm>
     </S.Post>
   );

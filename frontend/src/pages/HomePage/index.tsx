@@ -88,7 +88,7 @@ const HomePage = () => {
   return (
     <S.HomePageContainer>
       {/* Barra de busca */}
-      <form onSubmit={handleSearch}>
+      <S.SearchForm onSubmit={handleSearch}>
         <input
           type="text"
           value={searchTerm}
@@ -96,7 +96,7 @@ const HomePage = () => {
           placeholder="Buscar usuários..."
         />
         <button type="submit">🔍</button>
-      </form>
+      </S.SearchForm>
 
       {/* Resultados da busca */}
       {searchResults.length > 0 && (
@@ -111,20 +111,6 @@ const HomePage = () => {
       )}
 
       {/* Botões de feed */}
-      <div>
-        <button
-          className={feedMode === "all" ? "active" : ""}
-          onClick={() => setFeedMode("all")}
-        >
-          Para você
-        </button>
-        <button
-          className={feedMode === "following" ? "active" : ""}
-          onClick={() => setFeedMode("following")}
-        >
-          Seguindo
-        </button>
-      </div>
 
       {/* Formulário de novo post */}
       <S.NewPostForm onSubmit={handleSubmit}>
@@ -137,7 +123,20 @@ const HomePage = () => {
       </S.NewPostForm>
 
       {/* Feed */}
-      <h2>{feedMode === "all" ? "Feed - Para você" : "Feed - Seguindo"}</h2>
+      <S.Tabs>
+        <S.FeedButton
+          className={feedMode === "all" ? "active" : ""}
+          onClick={() => setFeedMode("all")}
+        >
+          Para você
+        </S.FeedButton>
+        <S.FeedButton
+          className={feedMode === "following" ? "active" : ""}
+          onClick={() => setFeedMode("following")}
+        >
+          Seguindo
+        </S.FeedButton>
+      </S.Tabs>
       <S.Feed>
         {posts.map((post) => (
           <PostItem key={post.id} post={post} showAuthorLink={true} />
