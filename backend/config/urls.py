@@ -27,7 +27,8 @@ from users.views import (
     FollowToggleView,
     FollowersListView,
     FollowingListView,
-    UserListView
+    UserListView,
+    ChangePasswordView
 )
 from posts.views import (
     PostListCreateView, 
@@ -46,6 +47,7 @@ urlpatterns = [
 
     # Users
     path('api/users/', UserListView.as_view()),
+    path('api/users/change-password/', ChangePasswordView.as_view()),
 
     # Authenticação
     path('api/auth/register/', RegisterView.as_view()),

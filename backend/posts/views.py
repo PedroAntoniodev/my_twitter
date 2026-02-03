@@ -18,6 +18,11 @@ class PostListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def get_serializer_context(self): 
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -33,6 +38,11 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.user != instance.author:
             raise PermissionDenied("Você não pode excluir o post de outro usuário.")
         instance.delete()
+
+    def get_serializer_context(self): 
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
 
 
 class LikeToggleView(APIView):
@@ -92,3 +102,8 @@ class FeedView(generics.ListAPIView):
         return Post.objects.filter(
             Q(author__in=following_user_ids) | Q(author=user)
         ).order_by('-created_at')
+    
+    def get_serializer_context(self): 
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context

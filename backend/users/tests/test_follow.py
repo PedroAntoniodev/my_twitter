@@ -12,8 +12,15 @@ def test_follow_user_success():
     client.force_authenticate(user=alice)
 
     response = client.post(f"/api/follow/{bob.username}/")
+
     assert response.status_code == 200
     assert Follow.objects.filter(follower=alice, following=bob).exists()
+
+    profile_response = client.get(f"/api/profile/{bob.username}/")
+    profile_data = profile_response.json()
+
+    assert profile_response.status_code == 200
+    assert profile_data["followed_by_me"] is True
 
 @pytest.mark.django_db
 def test_follow_self_not_allowed():

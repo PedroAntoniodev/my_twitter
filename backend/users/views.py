@@ -15,7 +15,7 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
 class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by("id")
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
@@ -29,15 +29,37 @@ class MeView(APIView):
 class ProfileDetailView(APIView):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
-        return Response(ProfileSerializer(user.profile).data)
+        return Response(ProfileSerializer(user.profile, context={'request': request}).data)
+
+    
+    
 
 class ProfileUpdateView(APIView):
     def put(self, request):
         profile = request.user.profile
-        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        serializer = ProfileSerializer(profile, data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+        
+
+    
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+
+        if not user.check_password(old_password):
+            return Response({'detail': 'Senha antiga incorreta.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'detail': 'Senha alterada com sucesso.'}, status=status.HTTP_200_OK)
 
 class FollowToggleView(APIView):
     def post(self, request, username):

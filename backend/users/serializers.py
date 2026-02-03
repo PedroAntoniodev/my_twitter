@@ -8,9 +8,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email']
 
 class ProfileSerializer(serializers.ModelSerializer):
+    followed_by_me = serializers.SerializerMethodField()
     class Meta:
         model = Profile
-        fields = ['user', 'display_name', 'avatar', 'bio']
+        fields = [ 'display_name', 'avatar', 'bio', 'followed_by_me']
+        read_only_fields = ['followed_by_me']
+
+    def get_followed_by_me(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return Follow.objects.filter(follower=user, following=obj.user).exists()
+        return False
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
