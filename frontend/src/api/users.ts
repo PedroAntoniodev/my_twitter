@@ -1,26 +1,47 @@
+// src/api/users.ts
 const API_URL = "https://pedroantoniodev1.pythonanywhere.com/api";
 
-export interface RegisterPayload {
-  username: string;
-  email: string;
-  password: string;
-}
+// Buscar usuários
+export const searchUsers = async (term: string) => {
+  const res = await fetch(`${API_URL}/users/?search=${term}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("access")}`,
+    },
+  });
 
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-}
+  if (!res.ok) throw new Error("Erro ao buscar usuários");
+  return res.json();
+};
 
-export async function registerUser(
-  data: RegisterPayload
-): Promise<User | { detail: string }> {
-  const response = await fetch(`${API_URL}/register/`, {
+// Trocar a senha do usuario
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+) => {
+  const res = await fetch(`${API_URL}/users/change-password/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access")}`,
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      old_password: oldPassword,
+      new_password: newPassword,
+    }),
   });
-  return response.json();
-}
+
+  if (!res.ok) throw new Error("Erro ao trocar senha");
+  return res.json();
+};
+
+// usuario logado
+export const fetchCurrentUser = async () => {
+  const res = await fetch(`${API_URL}/auth/me/`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("access")}`,
+    },
+  });
+
+  if (!res.ok) throw new Error("Erro ao buscar usuário logado");
+  return res.json();
+};

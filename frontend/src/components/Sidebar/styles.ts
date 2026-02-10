@@ -21,3 +21,8 @@ export const SidebarContainer = styled.div`
     font-weight: bold;
   }
 `;
+
+export const SidebarContent = styled.div`
+  display: flex;
+  align-items: center;
+`;

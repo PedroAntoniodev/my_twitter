@@ -35,6 +35,7 @@ export const NewPostForm = styled.form`
 `;
 
 export const SearchForm = styled.form`
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
@@ -42,23 +43,20 @@ export const SearchForm = styled.form`
 
   input {
     flex: 1;
-    padding: 8px;
+    padding: 8px 32px 8px 12px;
     border-radius: 6px;
     border: 1px solid #ccc;
   }
 
-  button {
-    margin-left: 10px;
-    background-color: #007bff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  .icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+  }
 
-    &:hover {
-      background-color: #429dfd;
-    }
   }
 `;
 
@@ -88,5 +86,44 @@ export const FeedButton = styled.button`
 
   &.active {
     border-bottom: 2px solid #429dfd;
+  }
+`;
+
+export const SearchResults = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 999;
+`;
+
+export const SearchResultItem = styled.div`
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  a {
+    text-decoration: none;
+  }
+`;
+
+export const PostButton = styled.button`
+  background-color: #007bff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #429dfd;
   }
 `;

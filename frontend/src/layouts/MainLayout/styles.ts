@@ -2,23 +2,64 @@ import styled from "styled-components";
 
 export const MainLayoutContainer = styled.div`
   display: flex;
-  max-width: 1200px;
-  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
-export const SideBarContainer = styled.div`
+export const SideBarContainer = styled.aside`
   position: fixed;
-  left: calc(50% - 550px);
-  top: 40px;
-  width: 250px;
+  top: 0;
+  left: 0;
+  width: 220px;
   height: 100vh;
-  border-right: 1px solid #ddd;
+  background-color: #fff;
+  box-shadow: 0 0 10px #ddd;
   padding: 20px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const MainLayoutContent = styled.div`
-  max-width: 50%;
-  width: 100%;
-  margin-left: 260px;
-  padding: 20px;
+  flex: 1;
+  margin-left: 220px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-left: 0;
+    padding-bottom: 60px;
+    box-sizing: border-box;
+  }
+`;
+
+export const BottomBar = styled.nav`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  a {
+    text-decoration: none;
+    font-size: 24px;
+  }
+
+  button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
 `;

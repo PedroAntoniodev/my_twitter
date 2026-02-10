@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const ProfileContainer = styled.div`
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -34,20 +34,6 @@ export const InfoContent = styled.div`
   gap: 10px;
 `;
 
-export const FollowButton = styled.button`
-  background-color: #4a90e2;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-right: 0.5rem;
-
-  &:hover {
-    background-color: #007bff;
-  }
-`;
-
 export const FollowersCount = styled.p`
   font-size: 18px;
   margin-bottom: 20px;
@@ -67,9 +53,16 @@ export const Bio = styled.p`
 
 export const PostsContainer = styled.div`
   display: flex;
+  width: 50%;
+  margin: 0 auto;
   flex-direction: column;
   gap: 20px;
   margin-top: 20px;
+  padding-bottom: 20px;
+
+  @media (max-width: 768px) {
+    width: 80%;
+  }
 
   h3 {
     text-align: center;

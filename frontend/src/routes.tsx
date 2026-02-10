@@ -3,8 +3,8 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
-import ConfigPage from "./pages/ConfigPage";
 import MainLayout from "./layouts/MainLayout";
+import EditProfilePage from "./pages/EditProfilePage";
 
 const PageRoutes = () => {
   return (
@@ -33,7 +33,7 @@ const PageRoutes = () => {
         path="/profile/update"
         element={
           <MainLayout>
-            <ConfigPage />
+            <EditProfilePage />
           </MainLayout>
         }
       />

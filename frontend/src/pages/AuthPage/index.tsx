@@ -1,8 +1,10 @@
 import { useState } from "react";
 
-import * as S from "./styles";
 import RegisterForm from "../../components/RegisterForm";
 import LoginForm from "../../components/LoginForm";
+import { login, register } from "../../api/auth";
+
+import * as S from "./styles";
 
 const AuthPage = () => {
   /// true = register, false = login
@@ -21,59 +23,22 @@ const AuthPage = () => {
     }
 
     try {
-      const response = await fetch(
-        "https://pedroantoniodev1.pythonanywhere.com/api/auth/register/",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, email, password }),
-        },
-      );
+      const data = await register(username, email, password);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.username) {
-          alert("Esse usuário já existe!");
-        } else if (errorData.email) {
-          alert("Esse email já existe!");
-        } else {
-          alert("Erro ao registrar usuário, verifique os dados.");
-        }
-        return;
-      }
-
-      const data = await response.json();
       alert("Cadastro realizado com sucesso!");
       console.log("Resposta da API:", data);
 
       setIsRegister(false);
-    } catch {
-      alert("Erro ao registrar usuário, verifique os dados.");
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const handleLogin = async (username: string, password: string) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        "https://pedroantoniodev1.pythonanywhere.com/api/auth/login/",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-        },
-      );
+      const data = await login(username, password);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(
-          "Erro ao fazer login, verifique os dados." +
-            JSON.stringify(errorData),
-        );
-        return;
-      }
-
-      const data = await response.json();
       const { access, refresh } = data;
 
       localStorage.setItem("access", access);
@@ -81,7 +46,6 @@ const AuthPage = () => {
 
       window.location.href = "/home";
     } catch (error) {
-      alert("Erro na conexão com o servidor.");
       console.log(error);
     } finally {
       setLoading(false);

@@ -1,10 +1,15 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import * as S from "./styles";
+
 import type { Post } from "../../types/post";
 import type { User } from "../../types/user";
-import { Link } from "react-router-dom";
+
+import { fetchPosts, createPost } from "../../api/posts";
+import { searchUsers, fetchCurrentUser } from "../../api/users";
 
 import PostItem from "../../components/PostItem";
+
+import * as S from "./styles";
 
 const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -12,30 +17,33 @@ const HomePage = () => {
   const [feedMode, setFeedMode] = useState<"all" | "following">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  // Buscar posts conforme feedMode
   useEffect(() => {
-    const fetchPosts = async () => {
+    // Buscar posts
+    const LoadPosts = async () => {
       try {
-        const url =
-          feedMode === "all"
-            ? "https://pedroantoniodev1.pythonanywhere.com/api/posts/"
-            : "https://pedroantoniodev1.pythonanywhere.com/api/feed/";
-
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
-          },
-        });
-        if (!response.ok) throw new Error("Erro ao buscar posts");
-        const data = await response.json();
+        const data = await fetchPosts(feedMode);
         setPosts(data.results || data);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchPosts();
+    LoadPosts();
   }, [feedMode]);
+
+  // Buscar usuário logado
+  useEffect(() => {
+    const LoadUser = async () => {
+      try {
+        const data = await fetchCurrentUser();
+        setCurrentUser(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    LoadUser();
+  }, []);
 
   // Criar novo post
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,19 +51,7 @@ const HomePage = () => {
     if (!newPost.trim()) return;
 
     try {
-      const response = await fetch(
-        "https://pedroantoniodev1.pythonanywhere.com/api/posts/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
-          },
-          body: JSON.stringify({ content: newPost }),
-        },
-      );
-      if (!response.ok) throw new Error("Erro ao criar post");
-      const created = await response.json();
+      const created = await createPost(newPost);
       setPosts([created, ...posts]);
       setNewPost("");
     } catch (error) {
@@ -69,16 +65,7 @@ const HomePage = () => {
     if (!searchTerm.trim()) return;
 
     try {
-      const response = await fetch(
-        `https://pedroantoniodev1.pythonanywhere.com/api/users/?search=${searchTerm}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
-          },
-        },
-      );
-      if (!response.ok) throw new Error("Erro ao buscar usuários");
-      const data = await response.json();
+      const data = await searchUsers(searchTerm);
       setSearchResults(data.results || data);
     } catch (error) {
       console.error(error);
@@ -87,42 +74,48 @@ const HomePage = () => {
 
   return (
     <S.HomePageContainer>
-      {/* Barra de busca */}
       <S.SearchForm onSubmit={handleSearch}>
         <input
           type="text"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={async (e) => {
+            const value = e.target.value;
+            setSearchTerm(value);
+
+            if (value.trim()) {
+              try {
+                const data = await searchUsers(value);
+                setSearchResults(data.results || data);
+              } catch (error) {
+                console.error(error);
+              }
+            } else {
+              setSearchResults([]);
+            }
+          }}
           placeholder="Buscar usuários..."
         />
-        <button type="submit">🔍</button>
+        <span className="icon">🔍</span>
+        {searchResults.length > 0 && (
+          <S.SearchResults>
+            {searchResults.map((u) => (
+              <S.SearchResultItem key={u.id}>
+                <Link to={`/profile/${u.username}`}>@{u.username}</Link>
+              </S.SearchResultItem>
+            ))}
+          </S.SearchResults>
+        )}
       </S.SearchForm>
 
-      {/* Resultados da busca */}
-      {searchResults.length > 0 && (
-        <div>
-          <h3>Resultados:</h3>
-          {searchResults.map((u) => (
-            <div key={u.id}>
-              <Link to={`/profile/${u.username}`}>@{u.username}</Link>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Botões de feed */}
-
-      {/* Formulário de novo post */}
       <S.NewPostForm onSubmit={handleSubmit}>
         <textarea
           value={newPost}
           onChange={(e) => setNewPost(e.target.value)}
           placeholder="O que você está pensando?"
         />
-        <button type="submit">Postar</button>
+        <S.PostButton type="submit">Postar</S.PostButton>
       </S.NewPostForm>
 
-      {/* Feed */}
       <S.Tabs>
         <S.FeedButton
           className={feedMode === "all" ? "active" : ""}
@@ -139,7 +132,16 @@ const HomePage = () => {
       </S.Tabs>
       <S.Feed>
         {posts.map((post) => (
-          <PostItem key={post.id} post={post} showAuthorLink={true} />
+          <PostItem
+            key={post.id}
+            post={post}
+            showAuthorLink={true}
+            currentUser={currentUser?.username}
+            onPostUpdated={(updated) =>
+              setPosts(posts.map((p) => (p.id === updated.id ? updated : p)))
+            }
+            onPostDeleted={(id) => setPosts(posts.filter((p) => p.id !== id))}
+          />
         ))}
       </S.Feed>
     </S.HomePageContainer>
