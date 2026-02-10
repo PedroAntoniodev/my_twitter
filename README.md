@@ -82,9 +82,6 @@ Para que as rotas funcionem corretamente na Vercel, crie um arquivo vercel.json 
 - O frontend consome a API hospedada em PythonAnywhere:
   https://pedroantoniodev1.pythonanywhere.com
 
-- Configure esta URL como variável de ambiente no Vercel, por exemplo:
-  VITE_API_URL=https://pedroantoniodev1.pythonanywhere.com
-
 ---
 
 ## 🌐 Deploy
@@ -106,8 +103,7 @@ Para que as rotas funcionem corretamente na Vercel, crie um arquivo vercel.json 
 3. Configure o Root Directory para frontend.
 4. Build Command: npm run build
 5. Output Directory: dist
-6. Configure variáveis de ambiente (VITE_API_URL).
-7. Deploy automático a cada git push.
+6. Deploy automático a cada git push.
 
 ---
 
@@ -119,8 +115,5 @@ Para que as rotas funcionem corretamente na Vercel, crie um arquivo vercel.json 
 ---
 
 ## 📌 Observações
-
-- O favicon deve ser colocado na pasta public/ do frontend e referenciado em index.html:
-  <link rel="icon" href="/favicon.ico" />
 
 - Limpe o cache do navegador após deploy para ver alterações visuais.
