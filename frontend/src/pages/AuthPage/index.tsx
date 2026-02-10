@@ -30,6 +30,7 @@ const AuthPage = () => {
 
       setIsRegister(false);
     } catch (error) {
+      alert("Erro ao cadastrar, verifique os dados.");
       console.log(error);
     }
   };
@@ -46,6 +47,9 @@ const AuthPage = () => {
 
       window.location.href = "/home";
     } catch (error) {
+      alert(
+        "Erro ao fazer login, verifique suas credenciais e tente novamente.",
+      );
       console.log(error);
     } finally {
       setLoading(false);
